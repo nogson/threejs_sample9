@@ -15,6 +15,7 @@
     let grid; //ガイド
     let directional;
     let ambient;
+    let rotation = 0;
 
     //audio関連の変数
     let context;
@@ -119,7 +120,7 @@
       analyser.minDecibels = -90; //最小値
       analyser.maxDecibels = 0; //最大値
       analyser.smoothingTimeConstant = 0.65;
-      analyser.fftSize = fftSize; //音域の数
+      analyser.fftSize = 512; //音域の数
 
       bufferLength = analyser.frequencyBinCount; //fftSizeの半分のサイズ
       dataArray = new Uint8Array(bufferLength); //波形データ格納用の配列を初期化
@@ -144,14 +145,12 @@
       // それぞれの周波数の振幅を取得
       analyser.getByteFrequencyData(dataArray);
 
-      let pos = geometry.attributes.position.array;
-
       //ポジションをセット
       for (let i = 0; i < vertexCount; i++) {
         let j = i * 3;
-        let x = dataArray[j] !== void 0 ? dataArray[j] : 0;
-        let y = dataArray[j + 1] !== void 0 ? dataArray[j + 1] : 0;
-        let z = dataArray[j + 2] !== void 0 ? dataArray[j + 2] : 0;
+        let x = dataArray[j];
+        let y = dataArray[j + 1];
+        let z = dataArray[j + 2];
        
         let size = Math.sqrt(x * x + y * y + z * z);
         let normalize = [x / size * 2 - 1, y / size * 2 - 1, z / size * 2 - 1];
@@ -169,9 +168,9 @@
           normalize[2] = 0;
         }
 
-        x =  attributesPos[j]+normalize[0]/2;
-        y =  attributesPos[j+1]+normalize[1]/2;
-        z =  attributesPos[j+2]+normalize[2]/2;
+        x =  attributesPos[j]+normalize[0];
+        y =  attributesPos[j+1]+normalize[1];
+        z =  attributesPos[j+2]+normalize[2];
         
         
         geometry.attributes.position.setXYZ(i,x, y,z)
@@ -179,11 +178,18 @@
 
     }
 
+
+   
+
     //描画
     function render() {
 
       // rendering
       renderer.render(scene, camera);
+
+      rotation +=0.01;
+
+      sphere.rotation.set(rotation,rotation,0)
 
       setPosition();
       geometry.attributes.position.needsUpdate = true;
