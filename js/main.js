@@ -16,6 +16,8 @@
         let directional;
         let ambient;
         let rotation = 0;
+        let scale = 1;
+
 
         //audio関連の変数
         let context;
@@ -145,7 +147,7 @@
         function setPosition() {
             // それぞれの周波数の振幅を取得
             analyser.getByteFrequencyData(dataArray);
-
+            scale = (dataArray[0] + 10) / 10;
             //ポジションをセット
             for (let i = 0; i < vertexCount; i++) {
                 let j = i * 3;
@@ -158,15 +160,15 @@
 
 
                 if (Number.isNaN(normalize[0])) {
-                    normalize[0] = 0;
+                    normalize[0] = Math.random() * 0.1;
                 }
 
                 if (Number.isNaN(normalize[1])) {
-                    normalize[1] = 0;
+                    normalize[1] = Math.random() * 0.1;
                 }
 
                 if (Number.isNaN(normalize[2])) {
-                    normalize[2] = 0;
+                    normalize[2] = Math.random() * 0.1;
                 }
 
                 x = attributesPos[j] + normalize[0] * 2;
@@ -179,9 +181,6 @@
 
         }
 
-
-
-
         //描画
         function render() {
 
@@ -190,7 +189,9 @@
 
             rotation += 0.01;
 
-            sphere.rotation.set(rotation, rotation, 0)
+            sphere.rotation.set(rotation, rotation, 0);
+
+            sphere.scale.set(scale, scale, scale);
 
             setPosition();
             geometry.attributes.position.needsUpdate = true;
